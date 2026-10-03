@@ -1,9 +1,10 @@
 MIT License
 
+Copyright (c) 2026 Rootshell LLC, Kit Knox
 Copyright (c) 2026 Wawona
 
-Toolbar key catalog and layout behavior adapted from Rootshell,
-Copyright (c) 2026 Rootshell LLC, Kit Knox.
+The toolbar key catalog, layout behavior, and UIKit views start from
+Rootshell's keyboard toolbar.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

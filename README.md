@@ -1,8 +1,12 @@
 # ToolbarKeys
 
-Rust model of the Rootshell keyboard toolbar: built-in keys, drawer rows,
-custom sequences, and the bytes those keys send. Wawona and any other host
-draw the slots. This crate does not link UIKit or Android views.
+The toolbar starts from Rootshell. Copyright (c) 2026 Rootshell LLC, Kit Knox
+(MIT). That is the implementation Wawona picked up: built-in keys, drawer
+rows, custom sequences, and the bytes those keys send.
+
+This repo is the Rust model plus the UIKit views in `apple/Keyboard`. Wawona
+compiles those views. It does not keep a second copy. This crate does not
+link UIKit or Android views into the Rust library.
 
 iOS deployment stays 13.0. The same document is the Android layout. Watch,
 tvOS, and visionOS can use the `phone` or `pad` form. They do not get a
@@ -34,8 +38,8 @@ Do not grow a third copy in Wawona.
 
 ## License
 
-MIT. The key catalog and layout behavior are adapted from Rootshell
-(Copyright 2026 Rootshell LLC, Kit Knox), also MIT.
+MIT. Copyright (c) 2026 Rootshell LLC, Kit Knox, and Copyright (c) 2026
+Wawona. The toolbar implementation starts from Rootshell.
 
 ## Layer
 

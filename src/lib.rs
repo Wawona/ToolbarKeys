@@ -1,6 +1,7 @@
 //! Keyboard toolbar model shared by Wawona hosts.
 //!
-//! The catalog and layout behavior follow Rootshell's keyboard toolbar.
+//! Starting point: Rootshell's keyboard toolbar.
+//! Copyright (c) 2026 Rootshell LLC, Kit Knox. MIT.
 //! This crate does not draw. UIKit, Jetpack, AppKit, and WatchKit render
 //! the slots. Bytes from [`press_built_in`] and [`CustomKey::terminal_bytes`]
 //! go to the Wawona PTY or the Ghostty external I/O fd.

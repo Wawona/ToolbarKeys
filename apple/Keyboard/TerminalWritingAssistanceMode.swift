@@ -1,3 +1,5 @@
+// Copyright (c) 2026 Rootshell LLC, Kit Knox. Toolbar starting point. MIT.
+
 import Foundation
 
 public enum TerminalWritingAssistanceMode: String, Codable, CaseIterable, Hashable, Sendable {

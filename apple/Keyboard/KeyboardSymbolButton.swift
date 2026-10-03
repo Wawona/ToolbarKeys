@@ -1,4 +1,5 @@
 #if canImport(UIKit) && (os(iOS) || os(tvOS) || os(visionOS))
+// Copyright (c) 2026 Rootshell LLC, Kit Knox. Toolbar starting point. MIT.
 //
 //  KeyboardSymbolButton.swift
 //  Wawona
