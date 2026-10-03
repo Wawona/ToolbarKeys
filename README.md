@@ -19,14 +19,18 @@ second key catalog.
 
 Generated Swift and Kotlin bindings are Nix outputs. Do not commit them.
 
-## What stays in the app
+## UIKit views
 
-The row of buttons above the software keyboard is a platform view:
+`apple/Keyboard` is the iOS, iPadOS, tvOS, and visionOS drawing code
+(buttons, drawer, accessory chrome). Wawona compiles that directory from
+this repo. It does not keep a second copy.
 
-- iOS and iPadOS: UIKit input accessory, iOS 13 and later.
-- Android: a Compose or View row above the IME.
-- The host sends text bytes to the Wawona PTY or to Ghostty external I/O.
-  Action ids (`__dismiss__`, `__paste__`, ...) stay in the host.
+`WWNKeyboardAccessoryView` stays in Wawona. That file is the Wayland seat
+bridge (evdev keycodes into the compositor), not the toolbar library.
+
+The Rust crate is the layout and byte model. The Swift files still carry
+the Rootshell types the views switch on. New layout rules land in Rust.
+Do not grow a third copy in Wawona.
 
 ## License
 
