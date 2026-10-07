@@ -4,7 +4,7 @@
 //! Copyright (c) 2026 Rootshell LLC, Kit Knox. MIT.
 //! This crate does not draw. UIKit, Jetpack, AppKit, and WatchKit render
 //! the slots. Bytes from [`press_built_in`] and [`CustomKey::terminal_bytes`]
-//! go to the Wawona PTY or the Ghostty external I/O fd.
+//! go to the Wawona PTY.
 
 mod bytes;
 mod model;

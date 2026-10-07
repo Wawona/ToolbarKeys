@@ -44,4 +44,4 @@ Wawona. The toolbar implementation starts from Rootshell.
 ## Layer
 
 L3′ library. `github.com/Wawona/ToolbarKeys`. Wawona (L4) may depend on it.
-This repo does not depend on Wawona, Ghostty, or iland.
+This repo does not depend on Wawona or iland.

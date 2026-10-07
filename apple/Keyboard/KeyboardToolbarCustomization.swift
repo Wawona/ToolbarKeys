@@ -324,7 +324,7 @@ public enum KeySlot: Codable, Hashable, Sendable {
 // MARK: - DrawerToggleMode
 
 /// How the "…" button behaves when more than one drawer row is configured.
-public enum DrawerToggleMode: String, Codable, CaseIterable, Sendable {
+public enum DrawerToggleMode: String, Codable, CaseIterable, Hashable, Sendable {
     /// Each press reveals one more drawer row; when all are open, the next press collapses them.
     case stack
     /// Each press swaps the single drawer row's contents to the next drawer.
