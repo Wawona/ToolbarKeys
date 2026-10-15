@@ -287,10 +287,26 @@ open class KeyboardToolbarView: UIView {
 
     // MARK: - Initialization
 
+    private var chromeOptionsObserver: NSObjectProtocol?
+
     public init(sizes: KeyboardSizes = .current()) {
         self.sizes = sizes
         super.init(frame: .zero)
         setupViews()
+        chromeOptionsObserver = NotificationCenter.default.addObserver(
+            forName: KeyboardToolbarManager.optionsDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            self.tintOverlayView.backgroundColor = self.glassTintColor(for: self.traitCollection)
+        }
+    }
+
+    deinit {
+        if let chromeOptionsObserver {
+            NotificationCenter.default.removeObserver(chromeOptionsObserver)
+        }
     }
 
     public required init?(coder: NSCoder) {
@@ -1179,8 +1195,12 @@ open class KeyboardToolbarView: UIView {
     public var plateTrailingAnchor: NSLayoutXAxisAnchor { backgroundBlurView.trailingAnchor }
 
     public func glassTintColor(for traitCollection: UITraitCollection) -> UIColor {
-        let isLight = traitCollection.userInterfaceStyle != .dark
-        return (isLight ? UIColor.white : UIColor.black).withAlphaComponent(0.16)
+        let manager = KeyboardToolbarManager.shared
+        return ToolbarChromePalette.glassTint(
+            style: manager.chromeStyle,
+            themeAware: manager.themeAware,
+            traits: traitCollection
+        )
     }
 }
 

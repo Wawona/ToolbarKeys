@@ -32,7 +32,9 @@ open class KeyboardArrowJoystickButton: UIView {
         }
     }
 
-    private static let modeStorageKey = "wwn_keyboard_arrow_joystick_mode"
+    /// Shared with `KeyboardToolbarManager.arrowJoystickMode` / Global Settings.
+    /// Values: `joystick` or `cluster` (cluster == drawer toggle mode).
+    private static let modeStorageKey = "arrowJoystickMode"
 
     // MARK: - Properties
 
@@ -46,6 +48,8 @@ open class KeyboardArrowJoystickButton: UIView {
     public private(set) var mode: Mode = .joystick {
         didSet { updateAppearance() }
     }
+
+    private var modeOptionsObserver: NSObjectProtocol?
 
     private var sizes: KeyboardSizes
 
@@ -80,18 +84,50 @@ open class KeyboardArrowJoystickButton: UIView {
         self.sizes = sizes
         super.init(frame: .zero)
 
-        if let saved = UserDefaults.standard.string(forKey: Self.modeStorageKey),
-           let savedMode = Mode(rawValue: saved) {
-            mode = savedMode
-        } else {
-            mode = .joystick
-        }
-
+        mode = Self.loadModeFromDefaults()
         setupView()
+        modeOptionsObserver = NotificationCenter.default.addObserver(
+            forName: KeyboardToolbarManager.optionsDidChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            let next = Self.loadModeFromDefaults()
+            if self.mode != next {
+                self.mode = next
+            }
+        }
+    }
+
+    deinit {
+        if let modeOptionsObserver {
+            NotificationCenter.default.removeObserver(modeOptionsObserver)
+        }
     }
 
     public required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    /// Settings uses `cluster` for drawer-toggle mode; long-press used to store `drawer`.
+    private static func loadModeFromDefaults() -> Mode {
+        let raw = UserDefaults.standard.string(forKey: modeStorageKey) ?? ""
+        switch raw {
+        case Mode.joystick.rawValue, "joystick":
+            return .joystick
+        case Mode.drawer.rawValue, "drawer", "cluster":
+            return .drawer
+        default:
+            return .joystick
+        }
+    }
+
+    private static func persistMode(_ mode: Mode) {
+        // Write the Global Settings token (`cluster` not legacy `drawer`).
+        let token = (mode == .joystick) ? "joystick" : "cluster"
+        UserDefaults.standard.set(token, forKey: modeStorageKey)
+        // Refresh manager Published props without a second UserDefaults write.
+        KeyboardToolbarManager.shared.reloadHostOptionsFromDefaults()
     }
 
     // MARK: - Setup
@@ -242,7 +278,7 @@ open class KeyboardArrowJoystickButton: UIView {
         // Toggle mode
         let newMode: Mode = (mode == .drawer) ? .joystick : .drawer
         mode = newMode
-        UserDefaults.standard.set(newMode.rawValue, forKey: Self.modeStorageKey)
+        Self.persistMode(newMode)
 
         // Haptic
         #if !os(visionOS)

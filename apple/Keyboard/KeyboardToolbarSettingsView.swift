@@ -13,6 +13,8 @@ public struct KeyboardToolbarSettingsView: View {
 
     public var body: some View {
         List {
+            dockingSection
+            chromeSection
             mainSection
             drawerSections
             customSection
@@ -87,6 +89,29 @@ public struct KeyboardToolbarSettingsView: View {
             }
             Button(action: { showingNewKey = true }) {
                 Text("New Custom Key")
+            }
+        }
+    }
+
+    private var dockingSection: some View {
+        Section(footer: Text("Persistent Toolbar keeps the row when the software keyboard dismisses. Show with Hardware Keyboard docks the row while an external keyboard is connected (Rootshell).")) {
+            Toggle("Persistent Toolbar", isOn: $manager.persistentToolbar)
+            Toggle("Show Toolbar with Hardware Keyboard", isOn: $manager.showWithHardwareKeyboard)
+        }
+    }
+
+    private var chromeSection: some View {
+        Section(header: Text("Appearance"), footer: Text("Styles tint the toolbar glass and key highlights. Follow Theme uses the host light/dark appearance.")) {
+            Toggle("Follow Theme", isOn: $manager.themeAware)
+            Picker("Toolbar Style", selection: $manager.chromeStyle) {
+                ForEach(ToolbarChromeStyle.allCases, id: \.self) { style in
+                    Text(style.displayName).tag(style)
+                }
+            }
+            Picker("Arrow Key Mode", selection: $manager.arrowJoystickMode) {
+                ForEach(ToolbarArrowJoystickMode.allCases, id: \.self) { mode in
+                    Text(mode.displayName).tag(mode)
+                }
             }
         }
     }

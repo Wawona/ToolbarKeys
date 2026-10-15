@@ -8,8 +8,10 @@
 
 mod bytes;
 mod model;
+mod options;
 
 pub use model::*;
+pub use options::*;
 
 uniffi::setup_scaffolding!();
 
@@ -100,4 +102,17 @@ impl ToolbarSession {
 #[uniffi::export]
 pub fn toolbar_catalog_json() -> String {
     catalog_json()
+}
+
+#[uniffi::export]
+pub fn toolbar_options_default_json() -> String {
+    ToolbarOptions::default().to_json()
+}
+
+#[uniffi::export]
+pub fn toolbar_options_parse_json(document: String) -> Result<String, ToolbarError> {
+    let opts = ToolbarOptions::from_json(&document).map_err(|err| ToolbarError::Invalid {
+        reason: err,
+    })?;
+    Ok(opts.to_json())
 }

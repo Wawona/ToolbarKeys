@@ -29,6 +29,15 @@ public class KeyboardToolbarManager: ObservableObject {
     private static let drawerOpenByDefaultKey = "keyboardToolbarDrawerOpenByDefault"
     private static let drawerToggleModeKey = "keyboardToolbarDrawerToggleMode"
     private static let deviceIdiomKey = "keyboardToolbarDeviceIdiom"
+    /// Rootshell `showToolbarWithHardwareKeyboard`.
+    private static let showWithHardwareKeyboardKey = "showToolbarWithHardwareKeyboard"
+    /// Rootshell `persistentToolbar`.
+    private static let persistentToolbarKey = "persistentToolbar"
+    private static let chromeStyleKey = "toolbarChromeStyle"
+    private static let themeAwareKey = "toolbarThemeAware"
+    private static let arrowJoystickModeKey = "arrowJoystickMode"
+
+    public static let optionsDidChangeNotification = Notification.Name("KeyboardToolbarOptionsDidChange")
 
     private var isReloading = false
 
@@ -63,6 +72,49 @@ public class KeyboardToolbarManager: ObservableObject {
         }
     }
 
+    /// Keep the toolbar docked while a hardware keyboard is connected.
+    @Published public var showWithHardwareKeyboard: Bool {
+        didSet {
+            guard !isReloading else { return }
+            UserDefaults.standard.set(showWithHardwareKeyboard, forKey: Self.showWithHardwareKeyboardKey)
+            NotificationCenter.default.post(name: Self.optionsDidChangeNotification, object: nil)
+        }
+    }
+
+    /// Keep the toolbar visible when the software keyboard is dismissed.
+    @Published public var persistentToolbar: Bool {
+        didSet {
+            guard !isReloading else { return }
+            UserDefaults.standard.set(persistentToolbar, forKey: Self.persistentToolbarKey)
+            NotificationCenter.default.post(name: Self.optionsDidChangeNotification, object: nil)
+        }
+    }
+
+    /// Follow host / terminal theme for glass and keycap tint.
+    @Published public var themeAware: Bool {
+        didSet {
+            guard !isReloading else { return }
+            UserDefaults.standard.set(themeAware, forKey: Self.themeAwareKey)
+            NotificationCenter.default.post(name: Self.optionsDidChangeNotification, object: nil)
+        }
+    }
+
+    @Published public var chromeStyle: ToolbarChromeStyle {
+        didSet {
+            guard !isReloading else { return }
+            UserDefaults.standard.set(chromeStyle.rawValue, forKey: Self.chromeStyleKey)
+            NotificationCenter.default.post(name: Self.optionsDidChangeNotification, object: nil)
+        }
+    }
+
+    @Published public var arrowJoystickMode: ToolbarArrowJoystickMode {
+        didSet {
+            guard !isReloading else { return }
+            UserDefaults.standard.set(arrowJoystickMode.rawValue, forKey: Self.arrowJoystickModeKey)
+            NotificationCenter.default.post(name: Self.optionsDidChangeNotification, object: nil)
+        }
+    }
+
     // MARK: - Computed Properties
 
     public var isCustomized: Bool {
@@ -81,6 +133,26 @@ public class KeyboardToolbarManager: ObservableObject {
         config = Self.loadConfig(idiom: idiom)
         customKeys = Self.loadCustomKeys()
         drawerOpenByDefault = UserDefaults.standard.bool(forKey: Self.drawerOpenByDefaultKey)
+        showWithHardwareKeyboard = UserDefaults.standard.bool(forKey: Self.showWithHardwareKeyboardKey)
+        persistentToolbar = UserDefaults.standard.bool(forKey: Self.persistentToolbarKey)
+        // Default on (Rootshell touch keyboard theme-aware default).
+        if UserDefaults.standard.object(forKey: Self.themeAwareKey) == nil {
+            themeAware = true
+        } else {
+            themeAware = UserDefaults.standard.bool(forKey: Self.themeAwareKey)
+        }
+        if let raw = UserDefaults.standard.string(forKey: Self.chromeStyleKey),
+           let style = ToolbarChromeStyle(rawValue: raw) {
+            chromeStyle = style
+        } else {
+            chromeStyle = .flat
+        }
+        if let raw = UserDefaults.standard.string(forKey: Self.arrowJoystickModeKey),
+           let mode = ToolbarArrowJoystickMode(rawValue: raw) {
+            arrowJoystickMode = mode
+        } else {
+            arrowJoystickMode = .joystick
+        }
 
         if let savedMode = UserDefaults.standard.string(forKey: Self.drawerToggleModeKey),
            let mode = DrawerToggleMode(rawValue: savedMode) {
@@ -175,6 +247,32 @@ public class KeyboardToolbarManager: ObservableObject {
         config = ToolbarLayoutConfig.defaultConfig(for: currentIdiom)
         customKeys = []
         notifyChange()
+    }
+
+    /// Reload docking / chrome prefs from UserDefaults (Global Settings writes).
+    public func reloadHostOptionsFromDefaults() {
+        isReloading = true
+        showWithHardwareKeyboard = UserDefaults.standard.bool(forKey: Self.showWithHardwareKeyboardKey)
+        persistentToolbar = UserDefaults.standard.bool(forKey: Self.persistentToolbarKey)
+        if UserDefaults.standard.object(forKey: Self.themeAwareKey) == nil {
+            themeAware = true
+        } else {
+            themeAware = UserDefaults.standard.bool(forKey: Self.themeAwareKey)
+        }
+        if let raw = UserDefaults.standard.string(forKey: Self.chromeStyleKey),
+           let style = ToolbarChromeStyle(rawValue: raw) {
+            chromeStyle = style
+        } else {
+            chromeStyle = .flat
+        }
+        if let raw = UserDefaults.standard.string(forKey: Self.arrowJoystickModeKey),
+           let mode = ToolbarArrowJoystickMode(rawValue: raw) {
+            arrowJoystickMode = mode
+        } else {
+            arrowJoystickMode = .joystick
+        }
+        isReloading = false
+        NotificationCenter.default.post(name: Self.optionsDidChangeNotification, object: nil)
     }
 
     // MARK: - Custom Key CRUD
